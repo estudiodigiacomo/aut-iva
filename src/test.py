@@ -1,0 +1,2 @@
+from run_pipeline import calcular_y_cargar_margenes
+calcular_y_cargar_margenes("CABALLERO EMANUEL")

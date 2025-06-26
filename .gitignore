@@ -1,0 +1,35 @@
+# Archivos de Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Entornos virtuales
+env/
+venv/
+.venv/
+
+# Archivos de configuración personal
+*.env
+*.local
+*.log
+
+# Credenciales
+keys.json
+
+# Archivos de descarga temporales y ZIPs
+*.zip
+*.crdownload
+
+# Archivos generados por Selenium
+D:/Clientes/
+
+# Jupyter Notebooks (si se usan)
+.ipynb_checkpoints/
+
+# VS Code settings (opcional)
+.vscode/
+
+# Archivos del sistema
+.DS_Store
+Thumbs.db
