@@ -77,6 +77,15 @@ def actualizar_totales_holistor(cliente: str, compras: float, ventas: float, she
 
     sheet = client.open(sheet_name).sheet1
     valores = sheet.get_all_values()
+    
+    def _to_float(value):
+        try:
+            return float(value)
+        except (TypeError, ValueError):
+            return 0.0
+
+    compras = _to_float(compras)
+    ventas = _to_float(ventas)
 
     for idx, fila in enumerate(valores[1:], start=2):  # Saltear encabezado, comienza en fila 2
         nombre_fila = fila[0].strip().lower()

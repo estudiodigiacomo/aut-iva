@@ -13,7 +13,7 @@ def calcular_total_compras_desde_excel(path_excel: str, log=print) -> float:
         log(f"⚠️ Fechas no válidas al parsear: {fechas_invalidas}")
 
         df["TOT_FAC"] = pd.to_numeric(df["TOT_FAC"], errors="coerce")
-
+        '''
         hoy = datetime.today()
         primer_dia_mes_anterior = datetime(hoy.year, hoy.month, 1) - timedelta(days=1)
         mes_anterior = primer_dia_mes_anterior.month
@@ -23,7 +23,14 @@ def calcular_total_compras_desde_excel(path_excel: str, log=print) -> float:
             (df["FECHA"].dt.month == mes_anterior) &
             (df["FECHA"].dt.year == anio_anterior)
         ]
+        '''
+        anio_actual = datetime.today().year
+        mes_deseado = 6  # <-- Cambiado a junio (fijo)
 
+        # Se filtra por mes fijo = 6 (junio) y el año actual
+        (df["FECHA"].dt.month == mes_deseado) & (df["FECHA"].dt.year == anio_actual)
+
+        '''
         log(f"🔢 Filas totales: {len(df)}")
         log(f"📅 Filas del período {mes_anterior}-{anio_anterior}: {len(df_periodo)}")
 
@@ -36,7 +43,7 @@ def calcular_total_compras_desde_excel(path_excel: str, log=print) -> float:
         total = df_filtrado["TOT_FAC"].sum()
         log(f"💰 Total compras: {total}")
         return round(total, 2)
-
+        '''
     except Exception as e:
         log(f"❌ Error al calcular compras desde {path_excel}: {e}")
         return 0.0

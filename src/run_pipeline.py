@@ -13,7 +13,7 @@ from oauth2client.service_account import ServiceAccountCredentials
 
 def run_iva_pipeline(client_name: str):
     print(f"\n Iniciando pipeline de IVA para: {client_name}")
-    portal_iva(client_name)
+    portal_iva(client_name, usar_archivos_locales=False)
     procesar_holistor_para_cliente(client_name)
     calcular_y_cargar_margenes(client_name)
 

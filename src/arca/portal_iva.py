@@ -20,11 +20,12 @@ def get_month_name(month_number):
               "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"]
     return months[month_number - 1]
 
-def portal_iva(client_name):
+def portal_iva(client_name, usar_archivos_locales=False):
     credentials_path = "keys.json"
     iva_sheet_name = "Automatizacion de IVA"
     auth_sheet_name = "DB_AUT"
 
+    driver = None
     scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
     creds = ServiceAccountCredentials.from_json_keyfile_name(credentials_path, scope)
     client = gspread.authorize(creds)
@@ -42,10 +43,31 @@ def portal_iva(client_name):
         return
 
     cuit = row[cuit_idx]
+    download_path = folders_report(client_name)
+
+    # ✅ Modo local sin Selenium
+    if usar_archivos_locales:
+        print("🔄 Modo prueba con archivos locales activado")
+
+        ventas_csv = os.path.join(download_path, "Libro de IVA - Ventas - ARCA.csv")
+        compras_csv = os.path.join(download_path, "Libro de IVA - Compras - ARCA.csv")
+
+        if not os.path.exists(ventas_csv):
+            ventas_csv = unzip_and_rename(download_path, new_name="Libro de IVA - Ventas - ARCA.csv")
+        if not os.path.exists(compras_csv):
+            compras_csv = unzip_and_rename(download_path, new_name="Libro de IVA - Compras - ARCA.csv")
+
+        ventas_total = sum_total_from_csv(ventas_csv, tipo="ventas")
+        compras_total = sum_total_from_csv(compras_csv, tipo="compras")
+
+        update_client_data(credentials_path, iva_sheet_name, client_name, tax_id=cuit,
+                           ventas_arca=ventas_total, compras_arca=compras_total)
+
+        print("✅ Datos cargados desde archivos locales")
+        return
 
     try:
         print(f"Procesando cliente: {client_name}")
-        download_path = folders_report(client_name)
         driver = create_driver(download_path)
 
         creds_dict = get_login_credentials(credentials_path, auth_sheet_name, client_name)
@@ -73,12 +95,9 @@ def portal_iva(client_name):
         )
         ingresar_btn.click()
 
-        # Nuevo bloque robusto para seleccionar el período
-        today = datetime.today()
-        first_day_this_month = today.replace(day=1)
-        last_month = first_day_this_month - timedelta(days=1)
-        mes = last_month.month
-        anio = last_month.year
+        # 🔄 Selección fija de período (mes 6)
+        mes = 6
+        anio = datetime.today().year
         mes_str = f"{mes:02d}"
         anio_str = str(anio)
 
@@ -175,3 +194,7 @@ def portal_iva(client_name):
 
     except Exception as e:
         print(f"Error en cliente {client_name}: {e}")
+    finally:
+        if driver:
+            driver.quit()
+            print("🛑 Navegador cerrado")
